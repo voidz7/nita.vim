@@ -1,0 +1,17 @@
+sc.vim
+------
+
+A simple colorscheme which depends on terminal colors  
+
+
+Install
+-------
+
+Install using `plug`
+
+    Plug 'voidz7/nita.vim'
+
+Add the following to your `.vimrc` or `init.vim`
+
+    colorscheme nita
+
