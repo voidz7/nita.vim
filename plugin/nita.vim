@@ -36,8 +36,9 @@ function! ActiveStatusLine() abort
     let l:statusline.="%#CursorLineNr#"
     let l:statusline.="\ %F"
     let l:statusline.="%= "
-    let l:statusline.="%#SignColumn#"
+    let l:statusline.="%#MoreMsg#"
     let l:statusline.="\ %m"
+    let l:statusline.="%#SignColumn#"
     let l:statusline.="%{SyntaxItem()}"
     let l:statusline.="%#DiffChange#"
     let l:statusline.="\ %l/%L"
@@ -47,6 +48,7 @@ function! ActiveStatusLine() abort
 endfunction
 
 function! InactiveStatusLine() abort
+    let l:statusline="%#TabLineSel#"
     let l:statusline=""
     let l:statusline.="%2*\ %t\ "
     let l:statusline.="%3*"

@@ -1,8 +1,7 @@
 nita.vim
 ------
 
-A simple status line for vim terminal colors  
-
+nita is a minimal vim statusline  
 
 Install
 -------
