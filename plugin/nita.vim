@@ -23,6 +23,7 @@ function! LinePercent() abort
     return printf("%d%%", line('.') * 100 / line('$'))
 endfunction
 
+
 " Modified flag check
 function! Modified() abort
     if &modified
@@ -41,8 +42,6 @@ function! FileType() abort
     return tolower(&filetype)
 endfunction
 
-" NERDTree statusline
-"let NERDTreeStatusline="%2* nerdtree %5*"
 
 " Always show statusline
 set laststatus=2
@@ -69,7 +68,10 @@ function! ActiveStatusLine() abort
     let l:statusline.="%5*%="
 
     " Line percentage
-    let l:statusline.="%2* %{LinePercent()} "
+    " let l:statusline.="%2* %{LinePercent()} "
+
+    " Line numbers
+    let l:statusline.="%2* \ %l/%L "
 
     " File type
     let l:statusline.="%1* %{FileType()} "
