@@ -1,101 +1,99 @@
-" Syntax highlight group
+if !exists("g:nita_hide_syntax_item")
+    let g:nita_hide_syntax_item = 0
+endif
+
+if !exists("g:nita_hide_file_type")
+    let g:nita_hide_file_type = 0
+endif
+
 function! SyntaxItem() abort
+    if g:nita_hide_syntax_item == 1
+        return ""
+    endif
+
     let l:syntaxname = synIDattr(synID(line("."), col("."), 1), "name")
 
     if l:syntaxname != ""
-        return printf(" %s ", l:syntaxname)
+        return printf("\ \ %s", l:syntaxname)
     else
         return ""
     endif
 endfunction
 
-" Readonly flag check
+function! PlugLoaded(name)
+    return (
+        \ has_key(g:plugs, a:name) &&
+        \ isdirectory(g:plugs[a:name].dir))
+endfunction
+
+function! LinterStatus() abort
+    if PlugLoaded('ale')
+        let l:counts = ale#statusline#Count(bufnr(''))
+
+        if l:counts.total == 0
+            return ""
+        else
+            return printf("\ \ [%d]", l:counts.total)
+        endif
+    else
+        return ""
+    endif
+endfunction
+
 function! ReadOnly() abort
     if &readonly || !&modifiable
-        return " [RO] "
+        return "\ \ [RO]"
     else
         return ""
     endif
 endfunction
 
-" Line percentage
-function! LinePercent() abort
-    return printf("%d%%", line('.') * 100 / line('$'))
-endfunction
-
-
-" Modified flag check
 function! Modified() abort
     if &modified
-        return " [+] "
+        return "\ \ [+]"
     else
         return ""
     endif
 endfunction
 
-" File type
 function! FileType() abort
-    if len(&filetype) == 0
-        return "text"
+    if g:nita_hide_file_type == 1
+        return ""
     endif
 
-    return tolower(&filetype)
+    if len(&filetype) == 0
+        return " text"
+    endif
+
+    return printf("\ \ %s", tolower(&filetype))
 endfunction
 
+let NERDTreeStatusline="%1*\ nerdtree\ %3*"
 
-" Always show statusline
 set laststatus=2
 
-" Format active statusline
 function! ActiveStatusLine() abort
-    " Reset statusline
     let l:statusline=""
+    let l:statusline.="%1*\[%t\]\ "
+    let l:statusline.="%3*%=%1*"
+    let l:statusline.="%l/%L %c"
+    let l:statusline.="%{ReadOnly()}"
+    let l:statusline.="%{Modified()}"
+    let l:statusline.="%{LinterStatus()}"
+    let l:statusline.="%{SyntaxItem()}"
+    let l:statusline.="%{FileType()}"
 
-    " Filename
-    let l:statusline.="%1* %t "
-
-    " Show if file is readonly
-    let l:statusline.="%2*%{ReadOnly()}"
-
-    " Show if file has been modified
-    let l:statusline.="%2*%{Modified()}"
-
-
-    " Show syntax identifier
-    let l:statusline.="%2*%{SyntaxItem()}"
-
-    " Split right
-    let l:statusline.="%5*%="
-
-    " Line percentage
-    " let l:statusline.="%2* %{LinePercent()} "
-
-    " Line numbers
-    let l:statusline.="%2* \ %l/%L "
-
-    " File type
-    let l:statusline.="%1* %{FileType()} "
-
-    " Done
     return l:statusline
 endfunction
 
-" Format inactive statusline
 function! InactiveStatusLine() abort
-    " Reset statusline
     let l:statusline=""
+    let l:statusline.="%2*\[%t\]"
+    let l:statusline.="%3*"
 
-    " Filename
-    let l:statusline.="%3* %t "
-
-    " Blank
-    let l:statusline.="%5*"
-
-    " Done
     return l:statusline
 endfunction
 
-" Set active statusline
 function! SetActiveStatusLine() abort
     if &ft ==? 'nerdtree'
         return
@@ -105,7 +103,6 @@ function! SetActiveStatusLine() abort
     setlocal statusline+=%!ActiveStatusLine()
 endfunction
 
-" Set inactive statusline
 function! SetInactiveStatusLine() abort
     if &ft ==? 'nerdtree'
         return
@@ -115,11 +112,8 @@ function! SetInactiveStatusLine() abort
     setlocal statusline+=%!InactiveStatusLine()
 endfunction
 
-" Autocmd statusline
 augroup statusline
     autocmd!
     autocmd WinEnter,BufEnter * call SetActiveStatusLine()
     autocmd WinLeave,BufLeave * call SetInactiveStatusLine()
 augroup end
-
-
