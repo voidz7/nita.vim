@@ -43,16 +43,15 @@ set laststatus=2
 
 function! ActiveStatusLine() abort
     let l:line=''
-    let l:line .= '%#SLMode#'
+    let l:line .= '%#IncSearch#'
     let l:line .= ' %{g:currentmode[mode()]} '
-    let l:line .= '%#SLActive#'
+    let l:line .= '%#StatusLine#'
     let l:line .= ' %f  '
     let l:line .= '%y '
     let l:line .= ' %l/%L '
-    let l:line .= '%#Blank#'
+    let l:line .= '%#Comment#'
     let l:line .="%{ReadOnly()}"
     let l:line .="%{Modified()}"
-
     return l:line
 endfunction
 
