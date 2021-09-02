@@ -1,45 +1,3 @@
-if !exists("g:nita_hide_syntax_item")
-    let g:nita_hide_syntax_item = 0
-endif
-
-if !exists("g:nita_hide_file_type")
-    let g:nita_hide_file_type = 0
-endif
-
-function! SyntaxItem() abort
-    if g:nita_hide_syntax_item == 1
-        return ""
-    endif
-
-    let l:syntaxname = synIDattr(synID(line("."), col("."), 1), "name")
-
-    if l:syntaxname != ""
-        return printf("\ \ %s", l:syntaxname)
-    else
-        return ""
-    endif
-endfunction
-
-function! PlugLoaded(name)
-    return (
-        \ has_key(g:plugs, a:name) &&
-        \ isdirectory(g:plugs[a:name].dir))
-endfunction
-
-function! LinterStatus() abort
-    if PlugLoaded('ale')
-        let l:counts = ale#statusline#Count(bufnr(''))
-
-        if l:counts.total == 0
-            return ""
-        else
-            return printf("\ \ [%d]", l:counts.total)
-        endif
-    else
-        return ""
-    endif
-endfunction
-
 function! ReadOnly() abort
     if &readonly || !&modifiable
         return "\ \ [RO]"
@@ -47,6 +5,28 @@ function! ReadOnly() abort
         return ""
     endif
 endfunction
+
+let g:currentmode={
+    \ 'n'       : 'nor',
+    \ 'no'      : 'nor·op',
+    \ 'v'       : 'vis',
+    \ 'V'       : 'v·L',
+    \ "\<C-V>"  : 'v·B',
+    \ 's'       : 'sel',
+    \ 'S'       : 's·L',
+    \ '^S'      : 's·B',
+    \ 'i'       : 'ins',
+    \ 'R'       : 'rep',
+    \ 'Rv'      : 'v·rep',
+    \ 'c'       : 'cmd',
+    \ 'cv'      : 'vi.Ex',
+    \ 'ce'      : 'Ex',
+    \ 'r'       : 'prompt',
+    \ 'rm'      : 'more',
+    \ 'r?'      : 'confirm',
+    \ '!'       : 'sh',
+    \ 't'       : 'term'
+    \}
 
 function! Modified() abort
     if &modified
@@ -56,34 +36,24 @@ function! Modified() abort
     endif
 endfunction
 
-function! FileType() abort
-    if g:nita_hide_file_type == 1
-        return ""
-    endif
-
-    if len(&filetype) == 0
-        return " text"
-    endif
-
-    return printf("\ \ %s", tolower(&filetype))
-endfunction
 
 let NERDTreeStatusline="%1*\ nerdtree\ %3*"
 
 set laststatus=2
 
 function! ActiveStatusLine() abort
-    let l:statusline=""
-    let l:statusline.="%1*\[%t\]\ "
-    let l:statusline.="%3*%=%1*"
-    let l:statusline.="%l/%L %c"
-    let l:statusline.="%{ReadOnly()}"
-    let l:statusline.="%{Modified()}"
-    let l:statusline.="%{LinterStatus()}"
-    let l:statusline.="%{SyntaxItem()}"
-    let l:statusline.="%{FileType()}"
+    let l:line=''
+    let l:line .= '%#SLMode#'
+    let l:line .= ' %{g:currentmode[mode()]} '
+    let l:line .= '%#SLActive#'
+    let l:line .= ' %f  '
+    let l:line .= '%y '
+    let l:line .= ' %l/%L '
+    let l:line .= '%#Blank#'
+    let l:line .="%{ReadOnly()}"
+    let l:line .="%{Modified()}"
 
-    return l:statusline
+    return l:line
 endfunction
 
 function! InactiveStatusLine() abort
